@@ -3,8 +3,8 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 
 import 'reflect-metadata';
-import { DataSource } from 'typeorm';
-
+import { booksRouter } from './routes/booksRouter';
+import { AppDataSource } from './data-source';
 
 const app: Express = express();
 const port = process.env.PORT || 3500;
@@ -13,13 +13,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
+app.use('/books', booksRouter);
+
 app.get('/', (req: Request, res: Response) => {
   res.send('Welcome to Books REST API');
-});
-
-const AppDataSource = new DataSource({
-  type: "sqlite",
-  database: "database.sqlite",
 });
 
 AppDataSource.initialize()
