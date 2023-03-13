@@ -4,20 +4,32 @@ import { BookDataInterface } from "../../interfaces/BookDataInterface";
 
 @Entity()
 export class Book extends BaseEntity {
-
-    constructor(bookData: BookDataInterface) {
-        super()
-
-        this.title = bookData.title;
-        this.author = bookData.author;
-    }
     
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
-    @Column()
-    title: string;
+  @Column()
+  title: string;
 
-    @Column()
-    author: string;
+  @Column()
+  author: string;
+
+
+  static async createBook(bookData: BookDataInterface) {
+    const newBook = new Book();
+    
+    newBook.title = bookData.title;
+    newBook.author = bookData.author;
+
+    return newBook;
+  }
+
+  static async getAll() {
+    return Book.find();
+  }
+
+  static async getById(id: string) {
+    const booksArray = await Book.findBy({ id });
+    return booksArray[0];
+  }
 }
