@@ -1,17 +1,9 @@
 import { BaseEntity, Entity, PrimaryGeneratedColumn, Column } from "typeorm";
-import { AppDataSource } from "../../data-source";
 import { BookDataInterface } from "../../interfaces/BookDataInterface";
 
 
 @Entity()
 export class Book extends BaseEntity {
-
-  constructor(bookData: BookDataInterface) {
-    super()
-
-    this.title = bookData.title;
-    this.author = bookData.author;
-  }
     
   @PrimaryGeneratedColumn("uuid")
   id: string;
@@ -23,12 +15,21 @@ export class Book extends BaseEntity {
   author: string;
 
 
+  static async createBook(bookData: BookDataInterface) {
+    const newBook = new Book();
+    
+    newBook.title = bookData.title;
+    newBook.author = bookData.author;
+
+    return newBook;
+  }
+
   static async getAll() {
-    return await AppDataSource.manager.find(Book);
+    return Book.find();
   }
 
   static async getById(id: string) {
-    const booksArray = await AppDataSource.manager.findBy(Book, { id: id});
+    const booksArray = await Book.findBy({ id });
     return booksArray[0];
   }
 }
