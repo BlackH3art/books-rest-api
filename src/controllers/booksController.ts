@@ -8,10 +8,31 @@ import { BookDataInterface } from "../interfaces/BookDataInterface";
 export const getAllBooks = async (req: Request, res: Response) => {
 
   try {
-    const books = await AppDataSource.manager.find(Book);
+    /* 
+      ----------- BUG -------------
+      I didn't liked "mixed" approach within my controllers where sometimes I could use my ActiveRecord pattern
+      and sometimes I had to use "AppDataSource.manager" which acts kind of like DataMapper pattern.
+      TypeOrm documentation example with getting all rows frome table, doesn't work:
+      https://typeorm.io/active-record-data-mapper
+
+      So I decided to abstract away this logic to my ActiveRecord, and here very weird issue occured. 
+      Everything works fine until you will remove unused line 29 with:
+        const books1 = await AppDataSource.manager.find(Book);
+
+      If you remove this line then suddenly whole app crashes, and every route responds with 500 server crash.
+      Even if this call is completely unused, somehow it is crucial for whole app to work properly
+      which makes no sense.
+
+      Error message:
+        "No metadata for \"Book\" was found."
+    */
+    const books1 = await AppDataSource.manager.find(Book);
+
+    const books = await Book.getAll();
     res.status(200).json(books);
 
   } catch (error) {
+    console.log(error);
     res.status(500).json({ msg: "Error while getting books", data: error });
   }
 }
@@ -35,10 +56,10 @@ export const deleteBook = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-    const book = await AppDataSource.manager.findBy(Book, { id: id});
-    if(book.length === 0) return res.status(404).json({ msg: "Not found" });
+    const book = await Book.getById(id);
+    if(!book) return res.status(404).json({ msg: "Not found" });
 
-    await AppDataSource.manager.delete(Book, book[0]);
+    await book.remove();
     res.status(204).json();
 
   } catch (error) {
