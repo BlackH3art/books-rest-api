@@ -1,10 +1,10 @@
 import { AppDataSource } from './data-source';
 import { App } from './App/App';
-import { BookRouter } from './routes/BookRouter';
+import { BooksRouter } from './routes/BooksRouter';
 
 const port = process.env.PORT || 3500;
 const app: App = new App(port, [
-  new BookRouter(),
+  new BooksRouter(),
 ]);
 
 

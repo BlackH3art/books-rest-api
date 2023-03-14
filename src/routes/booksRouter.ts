@@ -1,8 +1,22 @@
 import { Router } from "express";
-import { addBook, deleteBook, getAllBooks } from "../controllers/booksController";
+import { BooksController } from "../controllers/BooksController";
 
-export const booksRouter = Router();
+export class BooksRouter {
+  public router: Router;
+  public path: string;
+  private controller: BooksController;
 
-booksRouter.get('/', getAllBooks);
-booksRouter.post('/add', addBook);
-booksRouter.delete('/delete/:id', deleteBook);
+  constructor() {
+    this.router = Router();
+    this.path = "/books";
+    this.controller = new BooksController();
+
+    this.initializeRoutes();
+  }
+
+  private initializeRoutes() {
+    this.router.get('/', this.controller.getAllBooks);
+    this.router.post('/add', this.controller.addBook);
+    this.router.delete('/delete/:id', this.controller.deleteBook);
+  }
+}
