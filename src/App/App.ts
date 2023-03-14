@@ -1,6 +1,5 @@
 import express, { Express, Request, Response } from 'express';
 import bodyParser from 'body-parser';
-import { booksRouter } from '../routes/booksRouter';
 
 import 'reflect-metadata';
 
@@ -9,12 +8,12 @@ export class App {
   public app: Express;
   public port: number | string;
 
-  constructor(port: number | string, controllers: any[]) {
+  constructor(port: number | string, routers: any[]) {
     this.app = express();
     this.port = port;
 
     this.initializeMiddlewares();
-    this.initializeControllers(controllers);
+    this.initializeRouters(routers);
   }
 
   private initializeMiddlewares() {
@@ -22,13 +21,13 @@ export class App {
     this.app.use(bodyParser.urlencoded({ extended: true }));
   }
 
-  private initializeControllers(controllers: any[]) {
-    this.app.use('/books', booksRouter);
-    this.app.use('/', (req: Request, res: Response) => res.send('Welcome to Books REST API'));
+  private initializeRouters(routers: any[]) {
+    
+    routers.forEach(router => {
+      this.app.use(router.path, router.router);
+    });
 
-    controllers.forEach(controller => {
-      this.app.use('/books', booksRouter);
-    })
+    this.app.use('/', (req: Request, res: Response) => res.send('Welcome to Books REST API'));
   }
 
   public startServer() {
